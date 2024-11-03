@@ -80,4 +80,4 @@ def predict():
 
 if __name__ == '__main__':
     # Pour accepter les connexions externes, utilisez host='0.0.0.0'
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=5001)
