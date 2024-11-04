@@ -12,8 +12,8 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Chemins absolus vers le modèle et les labels
-MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Model-20241102_105616.keras')
-CLASS_LABELS_PATH = os.path.join(BASE_DIR, 'models', 'class_labels_20241102_105616.npy')
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Model-20241103_193011.keras')
+CLASS_LABELS_PATH = os.path.join(BASE_DIR, 'models', 'class_labels_20241103_193011.npy')
 
 # Charger le modèle et les labels au démarrage
 try:
@@ -40,40 +40,52 @@ def preprocess_image(image):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', class_labels=class_labels)
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         data = request.get_json()
-        img_data = data['image']
-        
-        # Décoder l'image base64
-        header, encoded = img_data.split(',', 1)
-        image_bytes = base64.b64decode(encoded)
-        image = np.frombuffer(image_bytes, dtype=np.uint8)
-        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-        
-        # Vérifier si l'image a été correctement chargée
-        if image is None:
-            raise ValueError("L'image n'a pas pu être décodée.")
-        
-        # Prétraiter l'image
-        processed_image = preprocess_image(image)
-        
-        # Faire la prédiction
-        prediction = model.predict(processed_image)[0]  # Obtenir les probabilités
-        predicted_class = np.argmax(prediction)
-        confidence = prediction[predicted_class]
+        img_data_list = data['images']  # Liste d'images encodées en base64
+
+        if not isinstance(img_data_list, list) or len(img_data_list) == 0:
+            raise ValueError("Aucune image reçue.")
+
+        processed_images = []
+        for img_data in img_data_list:
+            # Décoder l'image base64
+            header, encoded = img_data.split(',', 1)
+            image_bytes = base64.b64decode(encoded)
+            image = np.frombuffer(image_bytes, dtype=np.uint8)
+            image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+            # Vérifier si l'image a été correctement chargée
+            if image is None:
+                raise ValueError("Une des images n'a pas pu être décodée.")
+
+            # Prétraiter l'image
+            processed_image = preprocess_image(image)
+            processed_images.append(processed_image)
+
+        # Convertir en tableau numpy
+        batch_images = np.vstack(processed_images)  # Shape: (batch_size, 224, 224, 3)
+
+        # Faire les prédictions en batch
+        predictions = model.predict(batch_images)  # Shape: (batch_size, num_classes)
+
+        # Moyenniser les prédictions
+        avg_prediction = np.mean(predictions, axis=0)
+        predicted_class = np.argmax(avg_prediction)
+        confidence = avg_prediction[predicted_class]
         predicted_label = class_labels[predicted_class]
-        
-        # Préparer la réponse avec toutes les probabilités
+
+        # Préparer la réponse avec toutes les probabilités moyennées
         response = {
             'label': predicted_label,
             'confidence': float(confidence),
-            'probabilities': {class_labels[i]: float(prob) for i, prob in enumerate(prediction)}
+            'probabilities': {class_labels[i]: float(prob) for i, prob in enumerate(avg_prediction)}
         }
-        
+
         return jsonify(response)
     except Exception as e:
         return jsonify({'error': str(e)})
