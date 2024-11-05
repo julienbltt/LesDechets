@@ -12,8 +12,8 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Chemins absolus vers le modèle et les labels
-MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Model-20241103_193011.keras')
-CLASS_LABELS_PATH = os.path.join(BASE_DIR, 'models', 'class_labels_20241103_193011.npy')
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Model-20241102_105616.keras')
+CLASS_LABELS_PATH = os.path.join(BASE_DIR, 'models', 'class_labels_20241102_105616.npy')
 
 # Charger le modèle et les labels au démarrage
 try:
@@ -92,4 +92,4 @@ def predict():
 
 if __name__ == '__main__':
     # Pour accepter les connexions externes, utilisez host='0.0.0.0'
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5005)

@@ -194,8 +194,15 @@ function getRandomColor() {
     return color;
 }
 
+const constraints = { 
+    video: { 
+        facingMode: { ideal: "environment" } // Privilégie la caméra arrière 
+    }, 
+    audio: false 
+};
+
 // Accéder à la webcam
-navigator.mediaDevices.getUserMedia({ video: true })
+navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
         video.srcObject = stream;
     })
