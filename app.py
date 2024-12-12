@@ -14,6 +14,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Chemins absolus vers le modèle et les labels
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Model-20241102_105616.keras')
 CLASS_LABELS_PATH = os.path.join(BASE_DIR, 'models', 'class_labels_20241102_105616.npy')
+SSL_CERTIFICATE_PATH = os.path.join(BASE_DIR, 'certificate', 'noventaris.fr-2024-12-11.crt')
+SSL_KEY_PATH = os.path.join(BASE_DIR, 'certificate', 'noventaris.fr-2024-12-11.key')
 
 # Charger le modèle et les labels au démarrage
 try:
@@ -92,4 +94,4 @@ def predict():
 
 if __name__ == '__main__':
     # Pour accepter les connexions externes, utilisez host='0.0.0.0'
-    app.run(debug=True, host='0.0.0.0', port=5005)
+    app.run(debug=False, host='0.0.0.0', port=5005)

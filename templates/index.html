@@ -71,9 +71,19 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
             z-index: 9999;
+            animation: spin 1s linear infinite; /* Animation de rotation */
         }
+        /* Animation de rotation */ 
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Results display */
         .result-display {
             display: flex;
@@ -95,10 +105,8 @@
 </head>
 <body>
     <!-- Spinner -->
-    <div id="spinner" class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-
+    <div id="spinner" class="spinner-border" role="status"></div>
+    
     <div class="container">
         <div class="row">
             <!-- Webcam Section -->
@@ -112,9 +120,6 @@
                     <button id="resetHistory" class="btn btn-danger mb-3">Réinitialiser l'Historique</button>
                     <div id="history" class="list-group mb-4">
                         <!-- Les éléments de l'historique seront ajoutés ici -->
-                    </div>
-                    <div class="history-chart">
-                        <canvas id="historyChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -142,6 +147,9 @@
                 <!-- Average Confidence Chart -->
                 <div class="average-chart mt-5">
                     <h3 class="mb-3">Confiance Moyenne</h3>
+                    <div class="history-chart">
+                        <canvas id="historyChart"></canvas>
+                    </div>
                     <canvas id="averageConfidenceChart"></canvas>
                 </div>
                 <!-- Class Distribution Chart -->
